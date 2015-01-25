@@ -1,0 +1,45 @@
+#include <iostream>
+
+class NeuroNOC
+{
+  public:
+    NeuroNOC(int someInt);
+    ~NeuroNOC();
+  //---
+    int GetVar() const;
+    void SetVar(int var);
+    void Step();
+  private:
+    int theVar;
+    char * someString;
+  };
+
+#include "main.h"
+
+// constructor
+NeuroNOC::NeuroNOC(int someInt)
+{
+  theVar = someInt;
+  string = new char[10];
+}
+
+NeuroNOC::~NeuroNOC()
+{
+  delete[];
+}
+
+int NeuroNOC::GetVar()
+{
+  return theVar;
+}
+
+void NeuroNOC::SetVar(int someInt) {
+  theVar = someInt;
+  return;
+}
+
+void NeuroNOC::Step() {
+  //do nothing.
+  return;
+}
+
