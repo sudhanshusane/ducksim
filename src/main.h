@@ -1,5 +1,5 @@
-#ifndef _MAIN_H
-#define _MAIN_H
+#ifndef DUCKSIM_MAIN_H
+#define DUCKSIM_MAIN_H
 
 //TODO
 

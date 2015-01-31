@@ -1,5 +1,5 @@
-#ifndef _NOC_FLIT_H
-#define _NOC_FLIT_H
+#ifndef DUCKSIM_NOC_FLIT_H
+#define DUCKSIM_NOC_FLIT_H
 
 namespace DuckSim {
   //TODO: ...

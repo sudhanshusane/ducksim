@@ -1,5 +1,5 @@
-#ifndef _NOC_BUFFER_H
-#define _NOC_BUFFER_H
+#ifndef DUCKSIM_NOC_BUFFER_H
+#define DUCKSIM_NOC_BUFFER_H
 
 
 namespace DuckSim {

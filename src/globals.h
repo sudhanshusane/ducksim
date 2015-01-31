@@ -1,5 +1,5 @@
-#ifndef _GLOBALS_H
-#define _GLOBALS_H
+#ifndef DUCKSIM_GLOBALS_H
+#define DUCKSIM_GLOBALS_H
 
 namespace DuckSim {
   //TODO: ...

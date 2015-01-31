@@ -1,5 +1,5 @@
-#ifndef _NOC_PORT_H
-#define _NOC_PORT_H
+#ifndef DUCKSIM_NOC_PORT_H
+#define DUCKSIM_NOC_PORT_H
 
 namespace DuckSim {
   //TODO: ...

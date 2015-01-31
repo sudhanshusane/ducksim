@@ -1,5 +1,5 @@
-#ifndef _DUCKSIM_H
-#define _DUCKSIM_H
+#ifndef DUCKSIM_DUCKSIM_H
+#define DUCKSIM_DUCKSIM_H
 
 
 namespace DuckSim {

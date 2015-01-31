@@ -15,7 +15,7 @@ namespace DuckSim {
    * number bit used to represent the source and destination nodes, number of
    * flits, source address and destination address sequentially.
    * 
-   * @version 1.0
+   * @version 0.1
    * 
    */
 
