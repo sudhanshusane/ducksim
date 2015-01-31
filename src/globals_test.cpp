@@ -5,10 +5,11 @@
  *
  * For example:
  *
- *   bool isWorking = TEST::Port();
+ *   bool isWorking = TEST::Globals();
  *
  */
 namespace TEST {
-  //TODO: ...
-}
 
+  //TODO: ...
+
+} //end: TEST (namespace)

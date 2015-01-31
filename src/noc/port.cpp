@@ -1,0 +1,6 @@
+
+namespace DuckSim {
+
+  //TODO: ...
+}
+

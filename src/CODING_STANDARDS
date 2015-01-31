@@ -1,0 +1,173 @@
+
+The following are 'extremely strong suggestions' for keeping DuckSim's
+source code consistent / readable / maintainable / extensible:
+
+-- Aesthetic:
+
+	If something can be done in a way that is easy to understand,
+	do it that way.  Do not make code that is clever and fast but
+	incomprehensible or subtle.  If you *have* to be esoteric or
+	do something that is fairly complex, make sure to comment
+	the confusion away entirely.
+
+	A tab is two (2) spaces.
+
+	Any time there is an operative character not inside a string,
+	such as '+', ',', '%', etc... a single space will follow:
+
+	|    printf( "Count: %d\tProduct: %d", count, (count * val) );
+
+	Where it improves readability, consider placing a space
+	between the outermost parenthesis of a method call:
+
+	|    f.someFunc( var1, var2, "....", (var3 / 2) );
+
+	Class names begin with an uppercase letter.
+
+	Variables should use camelCase, and should not make
+	reference to their type, in case the type changes later.
+	For example, do not name an int 'iCount' or 'intCount',
+	just call it 'count'.
+
+	Source file names and folder names are entirely lowercase.
+	
+
+-- Comments and Documentation:
+
+   	Don't attribute documentation to anyone by name, if you
+	need to refer to someone by name use a comment.  Attribution
+	of work should be done in one comment at the top of the source
+	code file.  In fact, that is encouraged so that people can
+	get credit for their work.
+
+   	Each class, each class-level variable, and each method will
+	recieve a comment following the JAVADOC standard.  DoxyGen
+	can be our friend if we follow these examples:
+
+	/** <--Two stars indicates this is documentation. */
+
+	/** This is the preferred way to do single-line documentation. */
+
+	/** The first line is a brief description up to the first period.
+	 * Anything on additional lines will be included in the detailed
+	 * description of the code element.  This is where you can
+	 * really get into the nitty gritty if something demands
+	 * explanation.  Prepending the 'at' sign makes something a
+	 * meta-data hint that will be used to make your source code
+	 * guide even smarter.  All multi-line documentation should
+	 * have a * on a line by itself at the end to improve readability.
+	 *
+	 * @version 1.0
+	 *
+	 */
+
+	 // This is a single-line comment, not documentation.
+	 /// Three slashes is documentation, but /** */ is preferred.
+
+	 /******************************************************//**
+	  * If you want to use lots of stars to open a comment
+	  * that is documentation, look at how those two slashes
+	  * hang at the end of the line, preserving the '/**'
+	  * use.
+	  *
+	  */
+
+-- I/O
+
+	Stream-based IO is evil and should not be used under any
+	circumstances.  Do not do this:
+
+	|    cout << "My name is " << f.getName() << " and I love threads!";
+
+	Not only does that involve four function calls, which is silly,
+	but since it does, there is a chance the thread may be switched
+	out of context in the middle of assembling the merged output, and
+	it is possible that output can get mangled if some thread is
+	brought in that outputs to stdout.  Stick with printf(), it has
+	atomic performance characteristics.  You'll be very happy you did.
+
+-- Include Guards:
+
+   	All header files should implement include guards that contain the
+	path to the file from the project root, as well as the file name,
+	using an underscore to seperate alpha elements.
+	
+	For example, in the file "ducksim/noc/flit.h":
+	|    #ifndef DUCKSIM_NOC_FLIT_H
+	|    #define DUCKSIM_NOC_FLIT_H
+	|
+	|    	    //Declarations
+	|
+	|    #endif
+
+-- File name conventions:
+
+   	The class 'Example' will have three files:
+
+	    example.cpp	    	 <-- Implementation
+	    example.h		 <-- Declaration
+	    example_test.cpp	 <-- Unit test code
+
+-- Namespaces:
+
+	With the exception of code in the main.cpp/main.h files,
+	all code will be in either the "DuckSim" or the "TEST" namespace.
+
+-- Unit testing:
+
+   	Any class that is considered fully-implemented will contain
+	a unit testing function of the exact same name as the class, but
+	located in the TEST namespace instead of DuckSim.  A call to
+	this function will return true if the test was successful, and
+	false if there was a problem with the test.
+
+	|    DuckSim::SomeObject o = new DuckSim::SomeObject(...);
+	|    bool success = TEST::SomeObject();
+
+	This unit test function naming standard will be used for classes
+	that are in nested or special namespaces or classes, as well:
+
+	|    DuckSim::SpecialVersion::SomeObject o =
+	    		new DuckSim::SpecialVersion::SomeObject(...);
+	|    bool success = TEST::SpecialVersion::SomeObject();
+
+	The internals of the unit test function are not specifically
+	defined, but they should attempt to be as independent from other
+	DuckSim classes as possible to keep the granularity of error
+	reporting as fine as possible.  That is to say, making a call
+	to TEST::SomeObject should not return false.
+
+-- Global variables:
+
+   	All global variables will be stored in one "globals" object
+	of the Globals class.  This object is meant to be read-only
+	in practice, and should not be accessed in any innermost
+	loops where performance is a factor.  All access to the globals
+	object will incur the overhead of a mutex lock and release
+	to enforce thread-safety for unforseen future use cases.
+
+	All mutable members of the globals object will be private
+	and accessible only through get/set methods that enforce
+	mutex discipline.
+
+	Only variable explicitly declared as constants can be made
+	public in the Globals class.
+
+-- Functions:
+
+	No DuckSim functions will be defined or called that are not
+	a member of a well-behaved, unit-tested, & fully-documented
+	class, with the single exception of main(...) in main.cpp;
+
+-- Variables / virtual keyword:
+
+	If it is possible, make a variable virtual, so some future
+	user of DuckSim can override it with their own data structure
+	in some use case that is not presently comprehended.
+
+	In all cases where get/set/constructor methods exist that
+	touch virtual variables, the methods need to be virtual
+	as well.
+
+	It is possible to use Templates to do some of this, sure...
+	...but simple code = clean code = code that gets used.

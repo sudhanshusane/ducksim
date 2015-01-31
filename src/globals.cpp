@@ -1,6 +1,3 @@
-#ifndef _DUCKSIM_H
-#define _DUCKSIM_H
-
 
 namespace DuckSim {
 
@@ -8,4 +5,3 @@ namespace DuckSim {
 
 } //end: DuckSim (namespace)
 
-#endif
