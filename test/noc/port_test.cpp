@@ -8,7 +8,10 @@
  *   bool isWorking = TEST::Port();
  *
  */
-namespace TEST {
-  //TODO: ...
-}
+namespace DuckSim {
+  namespace TEST {
+    //TODO: ...
 
+    
+  } //end: TEST (namespace)
+} //end: DuckSim (namespace)

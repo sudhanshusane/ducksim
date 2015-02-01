@@ -111,25 +111,26 @@ source code consistent / readable / maintainable / extensible:
 -- Namespaces:
 
 	With the exception of code in the main.cpp/main.h files,
-	all code will be in either the "DuckSim" or the "TEST" namespace.
+	all code will be in either the "DuckSim" or the "DuckSim::TEST"
+	namespace.
 
 -- Unit testing:
 
    	Any class that is considered fully-implemented will contain
 	a unit testing function of the exact same name as the class, but
-	located in the TEST namespace instead of DuckSim.  A call to
+	located in the TEST namespace inside of DuckSim.  A call to
 	this function will return true if the test was successful, and
 	false if there was a problem with the test.
 
 	|    DuckSim::SomeObject o = new DuckSim::SomeObject(...);
-	|    bool success = TEST::SomeObject();
+	|    bool success = DuckSim::TEST::SomeObject();
 
 	This unit test function naming standard will be used for classes
 	that are in nested or special namespaces or classes, as well:
 
 	|    DuckSim::SpecialVersion::SomeObject o =
 	    		new DuckSim::SpecialVersion::SomeObject(...);
-	|    bool success = TEST::SpecialVersion::SomeObject();
+	|    bool success = DuckSim::TEST::SpecialVersion::SomeObject();
 
 	The internals of the unit test function are not specifically
 	defined, but they should attempt to be as independent from other

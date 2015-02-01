@@ -11,6 +11,7 @@
  * specific mutexes, you might want 
  *
  */
+
 namespace DuckSim {
 
   class Globals {

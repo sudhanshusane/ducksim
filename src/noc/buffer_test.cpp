@@ -1,6 +1,0 @@
-
-namespace TEST {
-
-  //TODO: ...
-  
-}

@@ -5,11 +5,13 @@
  *
  * For example:
  *
- *   bool isWorking = TEST::Globals();
+ *   bool isWorking = TEST::DuckSim();
  *
  */
-namespace TEST {
+namespace DuckSim {
+  namespace TEST {
 
-  //TODO: ...
+    //TODO: ...
 
-} //end: TEST (namespace)
+  } //end:TEST (namespace)
+} //end: DuckSim (namespace)
