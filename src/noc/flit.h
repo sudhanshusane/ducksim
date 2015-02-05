@@ -5,11 +5,6 @@ namespace DuckSim {
   class Flit {
 
   private:
-    /** Provide an override for the << operator, in case this object
-     * is (for some reason) used in a stream context, no we can output
-     * some string value of the flit. */
-    friend std::ostream& Flit::operator<<(std::ostream&, const Flit&);
-
     /** Vector of data in this Flit, the default data is a single int. */
     virtual std::Vector<int> data();
 
@@ -36,6 +31,12 @@ namespace DuckSim {
   public:
     Flit( std::vector<int> data, int timeStampGenerated );
     ~Flit();
+
+    /** Provide an override for the << operator, in case this object
+     * is (for some reason) used in a stream context, no we can output
+     * some string value of the flit. */
+    friend std::ostream& Flit::operator<<(std::ostream&, const Flit&);
+
     void increaseHop();
     virtual int getHopCount();
     virtual int getType();

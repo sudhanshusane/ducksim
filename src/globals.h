@@ -16,12 +16,12 @@ namespace DuckSim {
     // The CONSTANTS section: ...
     // TODO: This needs to get cleaned up, perhaps nested in a class-name substructure?
     
-    const int NUM_FLIT_TYPE_BITS = 1;
-    const int NUM_VCID_BITS = 2;
-    const int INT_SIZE = sizeof(int);
-    const int NUMBER_OF_IP_NODE = 4;
+    static int NUM_FLIT_TYPE_BITS = 1;
+    static int NUM_VCID_BITS = 2;
+    static int INT_SIZE = sizeof(int);
+    static int NUMBER_OF_IP_NODE = 4;
 
-
+    
 
     
   }; //end: Globals (class)

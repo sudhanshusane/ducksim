@@ -20,14 +20,14 @@ namespace DuckSim {
    */
 
   /** Construct a new flit. */
-  Flit::Flit( std::Vector<int> data, int timeStampGenerated ) {
+  Flit::Flit( std::vector<int> data, int timeStampGenerated ) {
     this->data = data;
     this->timeStampGenerated = timeStampGenerated;
     this->timeStampLastService = timeStampGenerated;
     this->hop = 0;
     /**  Initialize our VCs as all unused. */
     for (auto& vc : VCs)
-vc = -1;
+      vc = -1;
 
     return;
   } // end:Flit (constructor)
@@ -71,10 +71,10 @@ vc = -1;
    */
   virtual int Flit::getVirtualChannelNo() {
     if (null == data) {
-return -1;
+      return -1;
     }
     return (data[0] >> globals.NUM_FLIT_TYPE_BITS)
-& ((1 << globals.NUM_VCID_BITS) - 1);
+      & ((1 << globals.NUM_VCID_BITS) - 1);
   } //end: getVirtualChannelNo
 
   /**
@@ -89,15 +89,15 @@ return -1;
     int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
 
     if (rest >= globals.NUM_ADDR_BITS) {
-temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-  & ((1 << globals.NUM_ADDR_BITS) - 1);
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+	& ((1 << globals.NUM_ADDR_BITS) - 1);
     } else {
-temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-  & ((1 << rest) - 1);
-temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_ADDR_BITS - rest)) - 1)) << rest)
-  | temp;
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+	& ((1 << rest) - 1);
+      temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_ADDR_BITS - rest)) - 1)) << rest)
+	| temp;
     }
-
+    
     return temp;
   } //end: getAddressLength
 
@@ -109,20 +109,20 @@ temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_ADDR_BITS - rest)) - 1)) << res
   virtual int Flit::getPacketLength() {
     int temp;
     int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
-+ globals.NUM_ADDR_BITS;
+      + globals.NUM_ADDR_BITS;
     int noOfInt = noOfBit / globals.INT_SIZE;
     int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
-
+    
     if (rest >= globals.NUM_FLITS_BITS) {
-temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-  & ((1 << globals.NUM_FLITS_BITS) - 1);
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+	& ((1 << globals.NUM_FLITS_BITS) - 1);
     } else {
-temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-  & ((1 << rest) - 1);
-temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_FLITS_BITS - rest)) - 1)) << rest)
-  | temp;
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+	& ((1 << rest) - 1);
+      temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_FLITS_BITS - rest)) - 1)) << rest)
+	| temp;
     }
-
+    
     return temp;
   } //end: getPacketLength
 
@@ -138,20 +138,20 @@ temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_FLITS_BITS - rest)) - 1)) << re
     int temp;
     int addrSize = getAddressLength();
     int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
-                  + globals.NUM_ADDR_BITS + globals.NUM_FLITS_BITS;
+      + globals.NUM_ADDR_BITS + globals.NUM_FLITS_BITS;
     int noOfInt = noOfBit / globals.INT_SIZE;
     int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
 
     if (rest >= addrSize) {
       temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-              & ((1 << addrSize) - 1);
+	& ((1 << addrSize) - 1);
     } else {
       temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-              & ((1 << rest) - 1);
+	& ((1 << rest) - 1);
       temp = ((data[noOfInt + 1] & ((1 << (addrSize - rest)) - 1)) << rest)
-              | temp;
+	| temp;
     }
-
+    
     return temp;
   } //end: getSourceNode
 
@@ -190,8 +190,8 @@ temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_FLITS_BITS - rest)) - 1)) << re
    *
    * @return an integer vector of data of the flit.
    */
-  virtual std::Vector<int> Flit::getData() {
-    std::Vector<int> temp( data.length );
+  virtual std::vector<int> Flit::getData() {
+    std::vector<int> temp( data.length );
     for (int i = 0; i < data.length; i++) {
       temp[i] = data[i];
     }
