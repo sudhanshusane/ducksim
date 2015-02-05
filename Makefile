@@ -4,7 +4,7 @@
 
 ## Utility program options:
 RM              = rm
-RMOPTS          = -f
+RMOPTS          =
 
 ## Compiler options for each component...
 ## ----------
@@ -20,41 +20,37 @@ CP		= src/core/
 MP		= src/mem/
 NP		= src/noc/
 UP		= src/util/
+TP		= test/
 
 ## Source files
-CORE_SRC	:= $(CP)temp.cpp
+CORE_SRC	:= $(CP)*.cpp
 CORE_HEADERS	:= $(CORE_SRC: %.cpp = %.h)
-CORE_TEST	:= $(CORE_SRC: %.cpp = %_test.cpp)
 CORE_OBJ	:= $(CORE_SRC: %.cpp = %.o)
 
-MEM_SRC		:= $(MP)temp.cpp
+MEM_SRC		:= $(MP)*.cpp
 MEM_HEADERS	:= $(MEM_SRC: %.cpp = %.h)
-MEM_TEST	:= $(MEM_SRC: %.cpp = %_test.cpp)
 MEM_OBJ		:= $(MEM_SRC: %.cpp = %.o)
 
-#Experimental concept:
-#MEM_OBJ		 = $(MEM_OBJ: $(MP) = $(BP))
+NOC_SRC		:= $(NP)*.cpp
+NOC_HEADERS	:= $(NOC_SRC: %.cpp = %.h)
+NOC_OBJ		:= $(NOC_SRC: %.cpp = %.o)
 
-NOC_SRC		:= $(NP)flit.cpp $(NP)buffer.cpp $(NP)port.cpp
-NOC_HEADERS	:= $(NP)flit.h $(NP)buffer.h $(NP)port.h
-NOC_TEST	:= $(NP)flit_test.cpp $(NP)buffer_test.cpp $(NP)port_test.cpp
+UTIL_SRC	:= $(UP)*.cpp
+UTIL_HEADERS	:= $(UTIL_SRC: %.cpp = %.h)
+UTIL_OBJ	:= $(UTIL_SRC: %.cpp = %.o)
 
-UTIL_SRC	:= $(UP)temp.cpp
-UTIL_HEADERS	:= $(UP)temp.h
-UTIL_TEST	:= $(UP)temp_test.cpp
+TEST_SRC	:= $(TP)*.cpp
+TEST_HEADERS	:= $(TEST_SRC: %.cpp = %.h)
+TEST_OBJ	:= $(TEST_SRC: %.cpp = %.o)
 
 ## Binary path
 BP	        = bin/
 ## List of all binaries
-CORE_OBJ	:= $(BP)core.o
-MEM_OBJ		:= $(BP)mem.o
-NOC_OBJ		:= $(BP)noc.o
-UTIL_OBJ	:= $(BP)util.o
-
 FINAL_OUTPUT	:= $(BP)ducksim
+TEST_OUTPUT	:= $(BP)testsim
 
-ALL_OBJECTS	:= $(CORE_OBJ) $(MEM_OBJ) $(NOC_OBJ) $(UTIL_OBJ)
-ALL_BINARIES	:= $(FINAL_OUTPUT) 
+ALL_OBJECTS	:= $(CORE_OBJ) $(MEM_OBJ) $(NOC_OBJ) $(UTIL_OBJ) $(TEST_OBJ)
+ALL_BINARIES	:= $(FINAL_OUTPUT) $(TEST_OUTPUT)
 
 ##########
 
@@ -65,20 +61,28 @@ all:		ducksim
 ducksim:  	core mem noc util
 		$(CC) $(CCOPTS) $(CORE_OBJ) $(MEM_OBJ) $(NOC_OBJ) $(UTIL_OBJ) -o $(FINAL_OUTPUT)
 
-core:		$(CORE_SRC) $(CORE_HEADERS) $(CORE_TEST)
-		$(CC) $(CCOPTS) $(CORE_SRC) $(CORE_OPTS) -c -o $(CORE_OBJ)
+core:		$(CORE_SRC) $(CORE_HEADERS)
+		$(CC) $(CCOPTS) $(CORE_OPTS) -c -- $(CORE_SRC)
 
-mem:		$(MEM_SRC) $(MEM_HEADERS) $(MEM_TEST)
-		$(CC) $(CCOPTS) $(MEM_SRC) $(MEM_OPTS) -c -o $(MEM_OBJ)
+mem:		$(MEM_SRC) $(MEM_HEADERS)
+		$(CC) $(CCOPTS) $(MEM_OPTS) -c -- $(MEM_SRC)
 
-noc:		$(NOC_SRC) $(NOC_HEADERS) $(NOC_TEST)
-		$(CC) $(CCOPTS) $(NOC_SRC) $(NOC_OPTS) -c -o $(NOC_OBJ)
+noc:		$(NOC_SRC) $(NOC_HEADERS)
+		$(CC) $(CCOPTS) $(NOC_OPTS) -c -- $(NOC_SRC)
 
-util:		$(UTIL_SRC) $(UTIL_HEADERS) $(UTIL_TEST)
-		$(CC) $(CCOPTS) $(UTIL_SRC) $(UTIL_OPTS) -c -o $(UTIL_OBJ)
+util:		$(UTIL_SRC) $(UTIL_HEADERS)
+		$(CC) $(CCOPTS) $(UTIL_OPTS) -c -- $(UTIL_SRC)
+
+test:		$(TEST_SRC) $(TEST_HEADERS) \
+		$(UTIL_SRC) $(UTIL_HEADERS) \
+		$(CORE_SRC) $(CORE_HEADERS) \
+		$(MEM_SRC) $(MEM_HEADERS)   \
+		$(NOC_SRC) $(NOC_HEADERS)
+		$(CC) $(CCOPTS) $(TEST_OPTS) -c -- $(TEST_SRC)
+		$(CC) $(CCOPTS) -o $(TEST_OUTPUT) -- $(TEST_OBJ)
 
 clean:
-		$(RM) $(RMOPTS) $(CP)*~ $(MP)*~ $(NP)*~ $(UP)*~ $(ALL_BINARIES) $(ALL_OBJECTS)
+		$(RM) $(RMOPTS) -- $(CP)*~ $(MP)*~ $(NP)*~ $(UP)*~ $(TP)*~ $(ALL_BINARIES)
 
 ##########
 

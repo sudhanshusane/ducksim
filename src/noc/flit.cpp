@@ -19,335 +19,300 @@ namespace DuckSim {
    * 
    */
 
-  class Flit {
+  /** Construct a new flit. */
+  Flit::Flit( std::Vector<int> data, int timeStampGenerated ) {
+    this->data = data;
+    this->timeStampGenerated = timeStampGenerated;
+    this->timeStampLastService = timeStampGenerated;
+    this->hop = 0;
+    /**  Initialize our VCs as all unused. */
+    for (auto& vc : VCs)
+vc = -1;
 
-  private:
-    /** Provide an override for the << operator, in case this object
-     * is (for some reason) used in a stream context, no we can output
-     * some string value of the flit. */
-    friend std::ostream& operator<<(std::ostream&, const Flit&);
+    return;
+  } // end:Flit (constructor)
 
-    /** Vector of data in this Flit, the default data is a single int. */
-    virtual std::Vector<int> data(1);
+  /** Discard this flit. */
+  Flit::~Flit() {
+    return;
+  } // end:~Flit (destructor)
 
-    /** The time stamp or simulation cycle when the flit was generated. */
-    virtual int timeStampGenerated;
+  /**
+   * Increases the hop count of the flit after it traverses a physical link.
+   *
+   */
+  void Flit::increaseHop() {
+    hop++;
+    return;
+  } //end: increaseHop
 
-    /** The time stamp or simulation cycle when the flit was last served. */
-    virtual int timeStampLastService;
+  /**
+   * Returns a count of hops that this flit has traversed.
+   *
+   * @return the hop count
+   */
+  virtual int Flit::getHopCount() {
+    return hop;
+  } //end: getHopCount
 
-    /** The address of the source node. */
-    virtual int src;
+  /**
+   * Returns the type of the flit. 
+   *
+   * @return one bit information to distinguish HEADER or DATA flit
+   */
+  virtual int Flit::getType() {
+    return this.data[0] & ((1 << globals.NUM_FLIT_TYPE_BITS) - 1);
+  } //end: getType
 
-    /** The address of the destination node. */
-    virtual int dest;
+  /**
+   * Returns the virtual channel information of the flit.
+   *
+   * @return virtual channel number
+   */
+  virtual int Flit::getVirtualChannelNo() {
+    if (null == data) {
+return -1;
+    }
+    return (data[0] >> globals.NUM_FLIT_TYPE_BITS)
+& ((1 << globals.NUM_VCID_BITS) - 1);
+  } //end: getVirtualChannelNo
 
-    /** The number of physical links (hops) this flit has traversed. */
-    virtual int hop;
+  /**
+   * Returns the number of bits required to encode and address in the flit
+   *
+   * @return number of bits to encode an address
+   */
+  virtual int Flit::getAddressLength() {
+    int temp;
+    int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS;
+    int noOfInt = noOfBit / globals.INT_SIZE;
+    int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
 
-    /** A vector of virtual channels.
-     * TODO: Explain how these are used here.
-     */
-    virtual std::Vector<int> VCs(globals.NUMBER_OF_IP_NODE);
+    if (rest >= globals.NUM_ADDR_BITS) {
+temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+  & ((1 << globals.NUM_ADDR_BITS) - 1);
+    } else {
+temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+  & ((1 << rest) - 1);
+temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_ADDR_BITS - rest)) - 1)) << rest)
+  | temp;
+    }
 
-  public:
+    return temp;
+  } //end: getAddressLength
 
-    /** Construct a new flit. */
-    Flit( std::Vector<int> data, int timeStampGenerated ) {
-      this->data = data;
-      this->timeStampGenerated = timeStampGenerated;
-      this->timeStampLastService = timeStampGenerated;
-      this->hop = 0;
-      /**  Initialize our VCs as all unused. */
-      for (auto& vc : VCs)
-	vc = -1;
+  /**
+   * Returns the number of flits in the packet to which this flit belongs.
+   *
+   * @return packet length in flits
+   */
+  virtual int Flit::getPacketLength() {
+    int temp;
+    int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
++ globals.NUM_ADDR_BITS;
+    int noOfInt = noOfBit / globals.INT_SIZE;
+    int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
 
-      return;
-    } // end:Flit (constructor)
+    if (rest >= globals.NUM_FLITS_BITS) {
+temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+  & ((1 << globals.NUM_FLITS_BITS) - 1);
+    } else {
+temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+  & ((1 << rest) - 1);
+temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_FLITS_BITS - rest)) - 1)) << rest)
+  | temp;
+    }
 
-    /** Discard this flit. */
-    ~Flit() {
-      return;
-    } // end:~Flit (destructor)
-
-    /**
-     * Increases the hop count of the flit after it traverses a physical link.
-     *
-     */
-    void increaseHop() {
-      hop++;
-      return;
-    } //end: increaseHop
-
-    /**
-     * Returns a count of hops that this flit has traversed.
-     *
-     * @return the hop count
-     */
-    virtual int getHopCount() {
-      return hop;
-    } //end: getHopCount
-
-    /**
-     * Returns the type of the flit. 
-     *
-     * @return one bit information to distinguish HEADER or DATA flit
-     */
-    virtual int getType() {
-      return this.data[0] & ((1 << globals.NUM_FLIT_TYPE_BITS) - 1);
-    } //end: getType
-
-    /**
-     * Returns the virtual channel information of the flit.
-     *
-     * @return virtual channel number
-     */
-    virtual int getVirtualChannelNo() {
-      if (null == data) {
-	return -1;
-      }
-      return (data[0] >> globals.NUM_FLIT_TYPE_BITS)
-	& ((1 << globals.NUM_VCID_BITS) - 1);
-    } //end: getVirtualChannelNo
-
-    /**
-     * Returns the number of bits required to encode and address in the flit
-     *
-     * @return number of bits to encode an address
-     */
-    virtual int getAddressLength() {
-      int temp;
-      int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS;
-      int noOfInt = noOfBit / globals.INT_SIZE;
-      int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
-
-      if (rest >= globals.NUM_ADDR_BITS) {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << globals.NUM_ADDR_BITS) - 1);
-      } else {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << rest) - 1);
-	temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_ADDR_BITS - rest)) - 1)) << rest)
-	  | temp;
-      }
-
-      return temp;
-    } //end: getAddressLength
-
-    /**
-     * Returns the number of flits in the packet to which this flit belongs.
-     *
-     * @return packet length in flits
-     */
-    virtual int getPacketLength() {
-      int temp;
-      int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
-	+ globals.NUM_ADDR_BITS;
-      int noOfInt = noOfBit / globals.INT_SIZE;
-      int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
-
-      if (rest >= globals.NUM_FLITS_BITS) {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << globals.NUM_FLITS_BITS) - 1);
-      } else {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << rest) - 1);
-	temp = ((data[noOfInt + 1] & ((1 << (globals.NUM_FLITS_BITS - rest)) - 1)) << rest)
-	  | temp;
-      }
-
-      return temp;
-    } //end: getPacketLength
+    return temp;
+  } //end: getPacketLength
 
 
-    /**
-     * Returns the address of the source node.  While doing so, it decodes
-     * the flit data to retrieve the sought information.  As the address might
-     * overlap in two adjacent 32-bit data, it takes care of such situation.
-     *
-     * @return address of the source node.
-     */
-    virtual int getSourceNode() {
-      int temp;
-      int addrSize = getAddressLength();
-      int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
-	+ globals.NUM_ADDR_BITS + globals.NUM_FLITS_BITS;
-      int noOfInt = noOfBit / globals.INT_SIZE;
-      int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
+  /**
+   * Returns the address of the source node.  While doing so, it decodes
+   * the flit data to retrieve the sought information.  As the address might
+   * overlap in two adjacent 32-bit data, it takes care of such situation.
+   *
+   * @return address of the source node.
+   */
+  virtual int Flit::getSourceNode() {
+    int temp;
+    int addrSize = getAddressLength();
+    int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
+                  + globals.NUM_ADDR_BITS + globals.NUM_FLITS_BITS;
+    int noOfInt = noOfBit / globals.INT_SIZE;
+    int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
 
-      if (rest >= addrSize) {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << addrSize) - 1);
-      } else {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << rest) - 1);
-	temp = ((data[noOfInt + 1] & ((1 << (addrSize - rest)) - 1)) << rest)
-	  | temp;
-      }
+    if (rest >= addrSize) {
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+              & ((1 << addrSize) - 1);
+    } else {
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+              & ((1 << rest) - 1);
+      temp = ((data[noOfInt + 1] & ((1 << (addrSize - rest)) - 1)) << rest)
+              | temp;
+    }
 
-      return temp;
-    } //end: getSourceNode
+    return temp;
+  } //end: getSourceNode
 
-    /**
-     * Returns the address of the destination node. While doing so, it decodes
-     * the flit data to retrieve the sought information. As the address might
-     * overlap in two adjacent 32 bit data, it takes care of such situation.
-     * 
-     * @return address of the destination node.
-     */
-    virtual int getDestinationNode() {
-      int temp;
-      int addrSize = getAddressLength();
-      int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
-	+ globals.NUM_ADDR_BITS + globals.NUM_FLITS_BITS
-	+ addrSize;
-      int noOfInt = noOfBit / globals.INT_SIZE;
-      int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
-      
-      if (rest >= addrSize) {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << addrSize) - 1);
-      } else {
-	temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
-	  & ((1 << rest) - 1);
-	temp = ((data[noOfInt + 1] & ((1 << (addrSize - rest)) - 1)) << rest)
-	  | temp;
-      }
-      
-      return temp;
-    } //end:getDestinationNode
-
+  /**
+   * Returns the address of the destination node. While doing so, it decodes
+   * the flit data to retrieve the sought information. As the address might
+   * overlap in two adjacent 32 bit data, it takes care of such situation.
+   * 
+   * @return address of the destination node.
+   */
+  virtual int Flit::getDestinationNode() {
+    int temp;
+    int addrSize = getAddressLength();
+    int noOfBit = globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS
+                  + globals.NUM_ADDR_BITS + globals.NUM_FLITS_BITS
+                  + addrSize;
+    int noOfInt = noOfBit / globals.INT_SIZE;
+    int rest = globals.INT_SIZE - (noOfBit % globals.INT_SIZE);
     
-    /**
-     * Returns the data of the flit
-     *
-     * @return an integer vector of data of the flit.
-     */
-    virtual std::Vector<int> getData() {
-      std::Vector<int> temp( data.length );
-      for (int i = 0; i < data.length; i++) {
-	temp[i] = data[i];
-      }
-      temp[0] >>>= (globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS);
-
-      return temp;
-    } //end: getData
-
-
-    /**
-     * Return the Hex value of the flit data.
-     * This is the equivalent of Java's .toString() routine for stream-contexts.
-     */
-    virtual std::ostream& operator<<(std::ostream &strm, const Flit &f) {
-      return strm << getHexData();
-    } //end: << (output stream operator override)
-
-    /**
-     * Return the Hex value of the flit data.
-     * An accessory function that can be called in non-stream contexts.
-     *
-     */
-    virtual std::string getHexData() {
-      std::string temp = "";
-      for (int i = 0; i < data.length; i++) {
-	temp += std::hex << data[i];
-      }
-      return temp;
-    } //end: getHexData
-
-
-    /**
-     * Sets the virtual channel information of the flit datya
-     *
-     * @param vcID virtual channel number
-     *
-     */
-    virtual void setVirtualChannelNo(int vcID) {
-      int mask = (1 << globals.NUM_VCID_BITS) - 1;
-      mask <<= globals.NUM_FLIT_TYPE_BITS;
-      mask = ~mask;
-      data[0] &= mask;
-      data[0] |= (vcID << globals.NUM_FLIT_TYPE_BITS);
-    } //end: setVirtualChannelNo
-
-    /**
-     * Sets the last service time information by the specified time stamp.
-     *
-     * @param timeStamp
-     *        the time stamp (cycle) when the flit receives some service.
-     *
-     */
-    virtual void setTimeStampLastService(int timeStamp) {
-      this->timeStampLastService = timeStamp;
-    } //end: setTimeStampLastService
-
-    /**
-     * Sets the generation time stamp.
-     *
-     * @param timeStamp
-     *        the time information when the flit is generated.
-     *
-     */
-    virtual void setTimeStampGenerated(int timeStamp) {
-      this->timeStampGenerated = timeStamp;
-    } //end: setTimeStampGenerated
-
-    /**
-     * Returns the generation time stamp of the flit
-     *
-     * @return generation time of the flit.
-     *
-     */
-    virtual int getTimeStampGenerated() {
-      return this->timeStampGenerated;
-    } //end: getTimeStampGenerated
-
-
-    /**
-     * Return the source address of the flit.
-     *
-     * @return address of the source node.
-     *
-     */
-    virtual int getSource() {
-      return src;
-    } //end: getSource
-
-
-    /**
-     * Return the destination address of the flit.
-     *
-     * @return address of the destination node.
-     *
-     */
-    virtual int getDest() {
-      return dest;
-    } //end: getDest
-
-
-    /**
-     * Sets the source address of the flit.
-     *
-     * @param src
-     *        address of the source node
-     */
-    virtual void setSource(int src) {
-      this->src = src;
-      return;
-    } //end: setSource
-
-
-    /**
-     * Sets the destination address of the flit
-     *
-     * @param dest
-     *        address of the destination node
-     */
-    virtual void setDest(int dest) {
-      this->dest = dest;
-      return;
-    } //end: setDest
-
+    if (rest >= addrSize) {
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+              & ((1 << addrSize) - 1);
+    } else {
+      temp = (data[noOfInt] >>> (globals.INT_SIZE - rest))
+              & ((1 << rest) - 1);
+      temp = ((data[noOfInt + 1] & ((1 << (addrSize - rest)) - 1)) << rest)
+              | temp;
+    }
     
-  } //end: Flit (class)
+    return temp;
+  } //end:getDestinationNode
+
+  
+  /**
+   * Returns the data of the flit
+   *
+   * @return an integer vector of data of the flit.
+   */
+  virtual std::Vector<int> Flit::getData() {
+    std::Vector<int> temp( data.length );
+    for (int i = 0; i < data.length; i++) {
+      temp[i] = data[i];
+    }
+    temp[0] >>>= (globals.NUM_FLIT_TYPE_BITS + globals.NUM_VCID_BITS);
+
+    return temp;
+  } //end: getData
+
+
+  /**
+   * Return the Hex value of the flit data.
+   * This is the equivalent of Java's .toString() routine for stream-contexts.
+   */
+  virtual std::ostream& Flit::operator<<(std::ostream &strm, const Flit &f) {
+    return strm << getHexData();
+  } //end: << (output stream operator override)
+
+  /**
+   * Return the Hex value of the flit data.
+   * An accessory function that can be called in non-stream contexts.
+   *
+   */
+  virtual std::string Flit::getHexData() {
+    std::string temp = "";
+    for (int i = 0; i < data.length; i++) {
+      temp += std::hex << data[i];
+    }
+    return temp;
+  } //end: getHexData
+
+
+  /**
+   * Sets the virtual channel information of the flit datya
+   *
+   * @param vcID virtual channel number
+   *
+   */
+  virtual void Flit::setVirtualChannelNo(int vcID) {
+    int mask = (1 << globals.NUM_VCID_BITS) - 1;
+    mask <<= globals.NUM_FLIT_TYPE_BITS;
+    mask = ~mask;
+    data[0] &= mask;
+    data[0] |= (vcID << globals.NUM_FLIT_TYPE_BITS);
+  } //end: setVirtualChannelNo
+
+  /**
+   * Sets the last service time information by the specified time stamp.
+   *
+   * @param timeStamp
+   *        the time stamp (cycle) when the flit receives some service.
+   *
+   */
+  virtual void Flit::setTimeStampLastService(int timeStamp) {
+    this->timeStampLastService = timeStamp;
+  } //end: setTimeStampLastService
+
+  /**
+   * Sets the generation time stamp.
+   *
+   * @param timeStamp
+   *        the time information when the flit is generated.
+   *
+   */
+  virtual void Flit::setTimeStampGenerated(int timeStamp) {
+    this->timeStampGenerated = timeStamp;
+  } //end: setTimeStampGenerated
+
+  /**
+   * Returns the generation time stamp of the flit
+   *
+   * @return generation time of the flit.
+   *
+   */
+  virtual int Flit::getTimeStampGenerated() {
+    return this->timeStampGenerated;
+  } //end: getTimeStampGenerated
+
+
+  /**
+   * Return the source address of the flit.
+   *
+   * @return address of the source node.
+   *
+   */
+  virtual int Flit::getSource() {
+    return src;
+  } //end: getSource
+
+
+  /**
+   * Return the destination address of the flit.
+   *
+   * @return address of the destination node.
+   *
+   */
+  virtual int Flit::getDest() {
+    return dest;
+  } //end: getDest
+
+
+  /**
+   * Sets the source address of the flit.
+   *
+   * @param src
+   *        address of the source node
+   */
+  virtual void Flit::setSource(int src) {
+    this->src = src;
+    return;
+  } //end: setSource
+
+
+  /**
+   * Sets the destination address of the flit
+   *
+   * @param dest
+   *        address of the destination node
+   */
+  virtual void Flit::setDest(int dest) {
+    this->dest = dest;
+    return;
+  } //end: setDest
+
 } //end: DuckSim (namespace)

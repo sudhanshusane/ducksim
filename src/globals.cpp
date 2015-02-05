@@ -14,35 +14,30 @@
 
 namespace DuckSim {
 
-  class Globals {
-  public:
-    Globals() {
-      return;
-    } //end: Globals (constructor)
-
-    ~Globals() {
-      
-      return;
-    } //end: ~Globals (destructor)
-
-  private:
-    /** Acquire a mutex on the global object.
-     * Anticipating future use cases involving massively parallel
-     * execution, all mutable data elements in the global object
-     * are protected by a mutex.  Access to them should not
-     * take place inside of an algorithm's innermost loop.
-     *
-     */
-    void getLock(int domain) {
-      //TODO: Implement mutex lock framework.
-
-    } //end: getLock
-
-    void releaseLock() {
-      //TODO: ...
-    } //end: releaseLock
-    
-  } //end: Globals (class)
-
+  Globals() {
+    return;
+  } //end: Globals (constructor)
+  
+  ~Globals() {
+    return;
+  } //end: ~Globals (destructor)
+  
+  /** Acquire a mutex on the global object.
+   * Anticipating future use cases involving massively parallel
+   * execution, all mutable data elements in the global object
+   * are protected by a mutex.  Access to them should not
+   * take place inside of an algorithm's innermost loop.
+   *
+   */
+  void Globals::getLock(int domain) {
+    //TODO: Implement mutex lock framework.
+    return;
+  } //end: getLock
+  
+  void Globals::releaseLock() {
+    //TODO: ...
+    return;
+  } //end: releaseLock
+  
 } //end: DuckSim (namespace)
 
