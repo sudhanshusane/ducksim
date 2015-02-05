@@ -313,7 +313,40 @@ namespace DuckSim {
       return src;
     } //end: getSource
 
-    
+
+    /**
+     * Return the destination address of the flit.
+     *
+     * @return address of the destination node.
+     *
+     */
+    virtual int getDest() {
+      return dest;
+    } //end: getDest
+
+
+    /**
+     * Sets the source address of the flit.
+     *
+     * @param src
+     *        address of the source node
+     */
+    virtual void setSource(int src) {
+      this->src = src;
+      return;
+    } //end: setSource
+
+
+    /**
+     * Sets the destination address of the flit
+     *
+     * @param dest
+     *        address of the destination node
+     */
+    virtual void setDest(int dest) {
+      this->dest = dest;
+      return;
+    } //end: setDest
 
     
   } //end: Flit (class)
