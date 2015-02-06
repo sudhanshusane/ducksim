@@ -472,8 +472,9 @@
         input[type="reset"]:hover,
         input[type="button"]:hover,
         .button:hover {
-            /* background-color: #50fbc8; */
-            background-color: #409045;
+            /* background-color: #50fbc8; original */
+            /* background-color: #dfc12a; mustard yellow */
+            background-color: #379940;
             color: white !important;
         }
 
@@ -625,6 +626,7 @@
 
                 #nav > ul > li:hover a {
                     color: #fff;
+                    background-color: #237827;
                 }
 
                 #nav > ul > li.current {
@@ -695,6 +697,7 @@
 
             .dropotron > li.active > a, .dropotron > li:hover > a {
                 color: #fff;
+                background-color: #123913;
             }
 
         .dropotron.level-0 {
